@@ -10,7 +10,7 @@ print("4 - Lister configuration")
 print("5 - Sauvegarder configuration")
 print("6 - Restaurer configuration")
 print("7 - Outils de scan")
-choice = input(str("Selectionner le numero correspondant à l'option souhaitée"))
+choice = input(str("Selectionner le numero correspondant à l'option souhaitée\n"))
 if(choice == "1"):
     print("Ajouter une configuration")
 elif(choice == "2"):
