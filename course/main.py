@@ -71,14 +71,20 @@ def rol_config():
 def scan_ports(target):
     nm = nmap.PortScanner()
     print("Scan en cours sur {target}... \n")    
-    nm.scan(target, '1-1024')
+    
+    try:
+        nm.scan(target, '1-1024')
 
-    for proto in nm[target].all_protocols():
-        print(f"Protocole: {proto}")
-        lport = nm[target][proto].keys()
-        for port in sorted(lport):
-            print(f"Port: {port}\tState: {nm[target][proto][port]['state']}")
-
+        if target in nm.all_hosts():
+            for proto in nm[target].all_protocols():
+                print(f"Protocole: {proto}")
+                lport = nm[target][proto].keys()
+                for port in sorted(lport):
+                    print(f"Port: {port}\tState: {nm[target][proto][port]['state']}")
+        else:
+            print(f"Aucune donnée trouvée pour {target}. Peut-être que l'hôte est hors-ligne.")
+    except Exception as e:
+        print("Erreur lors du scan de {target}: {e}")
 
 #Fonction pour scanner les ports d'une range d'ip
 def scan_config():
