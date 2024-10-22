@@ -15,7 +15,7 @@ def add_config():
         "server_name": server_name,
         "IP_address": IP_address,
         "os": os,
-        "services": [services.strip() for service in services]
+        "services": [service.strip() for service in services]
     }
 
     configurations.append(configuration)
