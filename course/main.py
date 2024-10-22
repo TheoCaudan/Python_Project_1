@@ -35,7 +35,7 @@ def mod_config():
 def del_config():
     print("Vous êtes dans le menu de suppression de configuration \n")
     new_server_name = input("Entrez le nom du serveur à supprimer: ")
-    configurations = [for config in configurations if config["server_name"]!= new_server_name]
+    configurations = [config for config in configurations if config["server_name"] != new_server_name]
     print(f'Configuration supprimée pour {new_server_name}!')
             
 #list_config function
