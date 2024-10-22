@@ -67,9 +67,34 @@ def rol_config():
         configurations = json.load(f)
     print(f"Configurations restaurées avec succès depuis {file}!")
 
-#scanning_tool function
-#def scan_config():
+#scanning_tool function for scan_config to use after getting ips
+def scan_ports(target):
+    nm = nmap.PortScanner()
+    print("Scan en cours sur {target}... \n")    
+    nm.scan(target, '1-1024')
 
+    for proto in nm[target].all_protocols():
+        print(f"Protocole: {proto}")
+        lport = nm[target][proto].keys()
+        for port in sorted(lport):
+            print(f"Port: {port}\tState: {nm[target][proto][port]['state']}")
+
+
+#Fonction pour scanner les ports d'une range d'ip
+def scan_config():
+    print("Vous êtes dans le menu de scan \n")
+    ip_range = input("Entrez la plage d'adresses IP à scanner (ex: 192.168.1.1 ou 192.168.1.1-192.168.1.10): \n")
+
+    if '-' in ip_range:
+        start_ip, end_ip = ip_range.split('-')
+        start_ip_parts = list(map(int, start_ip.split('.')))
+        end_ip_parts = list(map(int, end_ip.split('.')))
+
+        for i in range(start_ip_parts[2], end_ip_parts[2] + 1):
+            ip_to_scan = f"{start_ip_parts[0]}.{start_ip_parts[1]}.{start_ip_parts[2]}.{i}"
+            scan_ports(ip_to_scan)
+    else:
+        scan_ports(ip_range)
 #Fonction pour afficher le menu et obtenir la sélection de l'utilisateur
 def afficher_menu():
     print("\n--- Menu ---")
@@ -109,11 +134,11 @@ if __name__ == "__main__":
             sav_config()
         elif choix == 6:
             rol_config()
-#        elif choix == 7:
-#            scan_config()
+        elif choix == 7:
+            scan_config()
         elif choix == 8:
             print("Fin du programme.")
-            break  # Quitte la boucle et termine le programme
+            break  
  
         # Après chaque action, le menu est reproposé
         print("\nOpération terminée. Reproposition du menu...\n")
