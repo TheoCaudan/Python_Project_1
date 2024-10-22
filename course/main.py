@@ -1,5 +1,4 @@
 import json
-import argparse
 import nmap
 
 configurations = []
@@ -36,7 +35,7 @@ def mod_config():
 def del_config():
     print("Vous êtes dans le menu de suppression de configuration \n")
     new_server_name = input("Entrez le nom du serveur à supprimer: ")
-    configurations = [config for config in configurations if config["server_name"]!= new_server_name]
+    configurations = [for config in configurations if config["server_name"]!= new_server_name]
     print(f'Configuration supprimée pour {new_server_name}!')
             
 #list_config function
@@ -71,39 +70,50 @@ def rol_config():
 #scanning_tool function
 #def scan_config():
 
-
-
-
-
-
-
-
-
-
-
-
-
-#main function
-print("Choisir une option :")
-print("1 - Ajouter configuration")
-print("2 - Modifier configuration")
-print("3 - Supprimer configuration")
-print("4 - Lister configuration")
-print("5 - Sauvegarder configuration")
-print("6 - Restaurer configuration")
-print("7 - Outils de scan")
-choice = input(str("Selectionner le numero correspondant à l'option souhaitée\n"))
-if(choice == "1"):
-    add_config()
-elif(choice == "2"):
-    mod_config()
-elif(choice == "3"):
-    del_config()
-elif(choice == "4"):
-    ls_config()
-elif(choice == "5"):
-    sav_config()
-elif(choice == "6"):
-    rol_config
-elif(choice == "7"):
-    print("Outils de scan")
+#Fonction pour afficher le menu et obtenir la sélection de l'utilisateur
+def afficher_menu():
+    print("\n--- Menu ---")
+    print("1. Ajouter une configuration")
+    print("2. Modifier une configuration")
+    print("3. Supprimer une configuration")
+    print("4. Lister les configurations")
+    print("5. Sauvegarder les configurations")
+    print("6. Restaurer les configurations")
+    print("7. Outils de Scan (Nmap)")
+    print("8. Quitter le programme")
+ 
+    while True:
+        try:
+            choix = int(input("Sélectionnez une option (1-8) : "))
+            if 1 <= choix <= 8:
+                return choix
+            else:
+                print("Erreur : Veuillez entrer un chiffre entre 1 et 8.")
+        except ValueError:
+            print("Erreur : Veuillez entrer un chiffre valide.")
+ 
+# Main : Gérer les choix de l'utilisateur via le menu
+if __name__ == "__main__":
+    while True:
+        choix = afficher_menu()
+ 
+        if choix == 1:
+            add_config()
+        elif choix == 2:
+            mod_config()
+        elif choix == 3:
+            del_config()
+        elif choix == 4:
+            ls_config()
+        elif choix == 5:
+            sav_config()
+        elif choix == 6:
+            rol_config()
+#        elif choix == 7:
+#            scan_config()
+        elif choix == 8:
+            print("Fin du programme.")
+            break  # Quitte la boucle et termine le programme
+ 
+        # Après chaque action, le menu est reproposé
+        print("\nOpération terminée. Reproposition du menu...\n")
