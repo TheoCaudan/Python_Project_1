@@ -2,7 +2,7 @@ import json
 import nmap
 
 configurations = []
-#add_config function
+
 def add_config():
     print("Vous êtes dans le menu d'ajout de configuration \n")
     server_name = input("Entrez le nom du serveur: ")
@@ -19,7 +19,6 @@ def add_config():
 
     configurations.append(configuration)
 
-#modify_config function
 def mod_config():
     print("Vous êtes dans le menu de modification de configuration \n")
     new_server_name = input("Entrez le nom du serveur: ")
@@ -31,14 +30,12 @@ def mod_config():
             return
         print(f'Aucune configuration trouvée pour {new_server_name}.')
 
-#delete_config function
 def del_config():
     print("Vous êtes dans le menu de suppression de configuration \n")
     new_server_name = input("Entrez le nom du serveur à supprimer: ")
     configurations = [config for config in configurations if config["server_name"] != new_server_name]
     print(f'Configuration supprimée pour {new_server_name}!')
-            
-#list_config function
+
 def ls_config():
     print("Vous êtes dans le menu de listage de configuration \n")
     if not configurations:
@@ -51,7 +48,6 @@ def ls_config():
         print(f" -Système d'exploitation: {config['os']}")
         print(f" -Services: {','.join(config['services'])}")
 
-#save_config function
 def sav_config():
     print("Vous êtes dans le menu de sauvegarde de configuration: \n")
     file = input("Entrez le nom du fichier de sauvegarde (ex: configurations.json): ")
@@ -59,7 +55,6 @@ def sav_config():
         json.dump(configurations, f)
     print(f"Configurations sauvegardées avec succès dans {file}!")
 
-#rollback_config function
 def rol_config():
     print("Vous êtes dans le menu de restauration de configuration: \n")
     file = input("Entrez le nom du fichier de sauvegarde à restaurer (ex: configurations.json): ")
@@ -70,23 +65,24 @@ def rol_config():
 #scanning_tool function for scan_config to use after getting ips
 def scan_ports(target):
     nm = nmap.PortScanner()
-    print("Scan en cours sur {target}... \n")    
+    print(f"Scan en cours sur {target}... \n")    
     
     try:
         nm.scan(target, '1-1024')
 
         if target in nm.all_hosts():
+            print(f"Serveur actif: {target}")
+            print(" - Services détectés:")
             for proto in nm[target].all_protocols():
-                print(f"Protocole: {proto}")
                 lport = nm[target][proto].keys()
                 for port in sorted(lport):
-                    print(f"Port: {port}\tState: {nm[target][proto][port]['state']}")
+                    service_name = nm[target][proto][port]['name'] if 'name' in nm[target][proto][port] else 'Unknown'
+                    print(f"    - Port: {port} : {service_name}")
         else:
             print(f"Aucune donnée trouvée pour {target}. Peut-être que l'hôte est hors-ligne.")
     except Exception as e:
-        print("Erreur lors du scan de {target}: {e}")
+        print(f"Erreur lors du scan de {target} : {e}")
 
-#Fonction pour scanner les ports d'une range d'ip
 def scan_config():
     print("Vous êtes dans le menu de scan \n")
     ip_range = input("Entrez la plage d'adresses IP à scanner (ex: 192.168.1.1 ou 192.168.1.1-192.168.1.10): \n")
@@ -96,12 +92,14 @@ def scan_config():
         start_ip_parts = list(map(int, start_ip.split('.')))
         end_ip_parts = list(map(int, end_ip.split('.')))
 
+        print("Résultats du scan: \n")
         for i in range(start_ip_parts[2], end_ip_parts[2] + 1):
             ip_to_scan = f"{start_ip_parts[0]}.{start_ip_parts[1]}.{start_ip_parts[2]}.{i}"
             scan_ports(ip_to_scan)
     else:
+        print("Résultats du scan: \n")
         scan_ports(ip_range)
-#Fonction pour afficher le menu et obtenir la sélection de l'utilisateur
+
 def afficher_menu():
     print("\n--- Menu ---")
     print("1. Ajouter une configuration")
@@ -123,7 +121,7 @@ def afficher_menu():
         except ValueError:
             print("Erreur : Veuillez entrer un chiffre valide.")
  
-# Main : Gérer les choix de l'utilisateur via le menu
+# Main : Manage user choice
 if __name__ == "__main__":
     while True:
         choix = afficher_menu()
@@ -146,5 +144,5 @@ if __name__ == "__main__":
             print("Fin du programme.")
             break  
  
-        # Après chaque action, le menu est reproposé
+        #Everytime menu is coming back
         print("\nOpération terminée. Reproposition du menu...\n")
