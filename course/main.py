@@ -54,10 +54,10 @@ def ls_config():
         return
     print(Fore.GREEN + "Configurations enregistrées: \n")
     for i, config in enumerate(configurations, 1):
-        print(Fore.GREY + f'{i}. {config["server_name"]}')
-        print(Fore.GREY + f" -Adresse IP: {config['IP_address']}")
-        print(Fore.GREY + f" -Système d'exploitation: {config['os']}")
-        print(Fore.GREY + f" -Services: {','.join(config['services'])}")
+        print(Fore.WHITE + f'\n{i}. {config["server_name"]}')
+        print(Fore.WHITE + f" -Adresse IP: {config['IP_address']}")
+        print(Fore.WHITE + f" -Système d'exploitation: {config['os']}")
+        print(Fore.WHITE + f" -Services: {','.join(config['services'])}")
 
 # fonction qui demande un nom de fichier et sauvegarde la config souhaitée dans un fichier .json
 def sav_config():
