@@ -1,8 +1,10 @@
 import json
 import nmap
 
+# declaration d'une variable globale accessible partout
 configurations = []
 
+# fonction d'ajout de config
 def add_config():
     print("Vous êtes dans le menu d'ajout de configuration \n")
     server_name = input("Entrez le nom du serveur: ")
@@ -19,23 +21,27 @@ def add_config():
 
     configurations.append(configuration)
 
+# fonction de modification d'adresse IP (pour le moment) pour le serveur donné
 def mod_config():
     print("Vous êtes dans le menu de modification de configuration \n")
     new_server_name = input("Entrez le nom du serveur: ")
     for config in configurations:
         if(config["server_name"] == new_server_name):
-            new_IP_address = input(f"Entrez la nouvelle IP pour {new_IP_address}: \n")
+            new_IP_address = input(f"Entrez la nouvelle IP pour {new_server_name}: \n")
             config["IP_address"] = new_IP_address
             print(f'Configuration mise à jour pour {new_server_name}!')
             return
         print(f'Aucune configuration trouvée pour {new_server_name}.')
 
+# fonction de suppression de config
 def del_config():
+    global configurations #necessaire pour que la fonction del_config accede à la variable globale
     print("Vous êtes dans le menu de suppression de configuration \n")
     new_server_name = input("Entrez le nom du serveur à supprimer: ")
     configurations = [config for config in configurations if config["server_name"] != new_server_name]
     print(f'Configuration supprimée pour {new_server_name}!')
 
+# fonction de listing des configs 
 def ls_config():
     print("Vous êtes dans le menu de listage de configuration \n")
     if not configurations:
@@ -48,6 +54,7 @@ def ls_config():
         print(f" -Système d'exploitation: {config['os']}")
         print(f" -Services: {','.join(config['services'])}")
 
+# fonction qui demande un nom de fichier et sauvegarde la config souhaitée dans un fichier .json
 def sav_config():
     print("Vous êtes dans le menu de sauvegarde de configuration: \n")
     file = input("Entrez le nom du fichier de sauvegarde (ex: configurations.json): ")
@@ -55,6 +62,7 @@ def sav_config():
         json.dump(configurations, f)
     print(f"Configurations sauvegardées avec succès dans {file}!")
 
+# permet de recuperer le json sauvegardé et le remettre à porter de main dans le menu
 def rol_config():
     print("Vous êtes dans le menu de restauration de configuration: \n")
     file = input("Entrez le nom du fichier de sauvegarde à restaurer (ex: configurations.json): ")
@@ -62,12 +70,12 @@ def rol_config():
         configurations = json.load(f)
     print(f"Configurations restaurées avec succès depuis {file}!")
 
-#scanning_tool function for scan_config to use after getting ips
+# outil de scan de port appelé par la fonction de scan 
 def scan_ports(target):
     nm = nmap.PortScanner()
     print(f"Scan en cours sur {target}... \n")    
     
-    try:
+    try: #permet de gerer les exceptions et continuer a executer meme si l'iteration precedente à echoué
         nm.scan(target, '1-1024')
 
         if target in nm.all_hosts():
@@ -80,9 +88,10 @@ def scan_ports(target):
                     print(f"    - Port: {port} : {service_name}")
         else:
             print(f"Aucune donnée trouvée pour {target}. Peut-être que l'hôte est hors-ligne.")
-    except Exception as e:
+    except Exception as e: # gestion exception : ici elle signale l'erreur
         print(f"Erreur lors du scan de {target} : {e}")
 
+# fonction de scan : recupere une IP ou une plage d'IP et la decoupe pour identifier depart et arrivee dans le scan
 def scan_config():
     print("Vous êtes dans le menu de scan \n")
     ip_range = input("Entrez la plage d'adresses IP à scanner (ex: 192.168.1.1 ou 192.168.1.1-192.168.1.10): \n")
@@ -100,6 +109,7 @@ def scan_config():
         print("Résultats du scan: \n")
         scan_ports(ip_range)
 
+# menu et display
 def afficher_menu():
     print("\n--- Menu ---")
     print("1. Ajouter une configuration")
@@ -121,7 +131,7 @@ def afficher_menu():
         except ValueError:
             print("Erreur : Veuillez entrer un chiffre valide.")
  
-# Main : Manage user choice
+# Main : gestion des choix utilisateurs
 if __name__ == "__main__":
     while True:
         choix = afficher_menu()
@@ -144,5 +154,5 @@ if __name__ == "__main__":
             print("Fin du programme.")
             break  
  
-        #Everytime menu is coming back
+        # une fois une operation executée on recharge le menu
         print("\nOpération terminée. Reproposition du menu...\n")
