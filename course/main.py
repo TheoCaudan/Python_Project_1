@@ -24,7 +24,7 @@ def mod_config():
     new_server_name = input("Entrez le nom du serveur: ")
     for config in configurations:
         if(config["server_name"] == new_server_name):
-            new_IP_address = input("Entrez la nouvelle IP pour {new_IP_address}")
+            new_IP_address = input(f"Entrez la nouvelle IP pour {new_IP_address}: \n")
             config["IP_address"] = new_IP_address
             print(f'Configuration mise à jour pour {new_server_name}!')
             return
