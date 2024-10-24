@@ -6,18 +6,9 @@ from colorama import init, Fore
 # Initialisation de colorama
 init(autoreset=True)
 
-# declaration d'une variable globale accessible partout
+# declaration d'une variable globale accessible partout pour sav/rol_configs pour la manipulation de fichiers
 configurations = []
-# declaration d'une variable pour print le titre de menu
-a = """
 
-,-.                               
-|  ) o                            
-|-<  . ,-. ;-. . , ,-. ;-. . . ,-.
-|  ) | |-' | | |/  |-' | | | | |-'
-`-'  ' `-' ' ' '   `-' ' ' `-` `-'
-
-"""
 # fonction d'ajout de config
 def add_config():
     print(Fore.CYAN + "Vous êtes dans le menu d'ajout de configuration \n")
@@ -121,7 +112,8 @@ def scan_config():
     print(Fore.CYAN + "Vous êtes dans le menu de scan \n")
     ip_range = input("Entrez la plage d'adresses IP à scanner (ex: 192.168.1.1 ou 192.168.1.1-192.168.1.10): \n")
 
-    if '-' in ip_range:
+
+    if '-' in ip_range: # detection du '-' pour savoir que ce soit une plage d'ip ou bien une ip seule
         start_ip, end_ip = ip_range.split('-')
         start_ip_parts = list(map(int, start_ip.split('.')))
         end_ip_parts = list(map(int, end_ip.split('.')))
@@ -130,15 +122,15 @@ def scan_config():
         for i in range(start_ip_parts[2], end_ip_parts[2] + 1):
             ip_to_scan = f"{start_ip_parts[0]}.{start_ip_parts[1]}.{start_ip_parts[2]}.{i}"
             scan_ports(ip_to_scan)
-    else:
+    else: # pour une ip seule
         print(Fore.CYAN + "Résultats du scan: \n")
         scan_ports(ip_range)
 
 # menu et display
 def afficher_menu():
-    global a
-    print(Fore.CYAN + a)
-    print(Fore.WHITE + "--- Menu ---")
+    print(Fore.CYAN + "╔═════════════════════════╗")
+    print(Fore.CYAN + "║" + Fore.WHITE + "        MAIN MENU        " + Fore.CYAN + "║")
+    print(Fore.CYAN + "╚═════════════════════════╝\n")
     print(Fore.CYAN + "1. Ajouter une configuration")
     print(Fore.CYAN + "2. Modifier une configuration")
     print(Fore.CYAN + "3. Supprimer une configuration")
@@ -148,7 +140,7 @@ def afficher_menu():
     print(Fore.CYAN + "7. Outils de Scan (Nmap)")
     print(Fore.CYAN + "8. Quitter le programme")
  
-    while True:
+    while True: 
         try:
             choix = int(input("Sélectionnez une option (1-8) : "))
             if 1 <= choix <= 8:
@@ -158,7 +150,7 @@ def afficher_menu():
         except ValueError:
             print(Fore.RED + "Erreur : Veuillez entrer un chiffre valide.")
  
-# Main : gestion des choix utilisateurs
+# Main : gestion des choix utilisateurs et affichage menu
 if __name__ == "__main__":
     while True:
         choix = afficher_menu()
