@@ -8,14 +8,23 @@ init(autoreset=True)
 
 # declaration d'une variable globale accessible partout
 configurations = []
+# declaration d'une variable pour print le titre de menu
+a = """
 
+,-.                               
+|  ) o                            
+|-<  . ,-. ;-. . , ,-. ;-. . . ,-.
+|  ) | |-' | | |/  |-' | | | | |-'
+`-'  ' `-' ' ' '   `-' ' ' `-` `-'
+
+"""
 # fonction d'ajout de config
 def add_config():
     print(Fore.CYAN + "Vous êtes dans le menu d'ajout de configuration \n")
-    server_name = input("Entrez le nom du serveur: ")
-    IP_address = input("Entrez l'adresse IP: ")
+    server_name = input("Entrez le nom du serveur: \n")
+    IP_address = input("Entrez l'adresse IP: \n")
     os = input("Entrez le système d'exploitation (ex: Windows, centOS, Ubuntu, Debian, Mint): \n")
-    services = input("Entrez les services en cours d'exécution (séparés par des virgules): ").split(",")
+    services = input("Entrez les services en cours d'exécution (séparés par des virgules): \n").split(",")
 
     configuration = {
         "server_name": server_name,
@@ -29,11 +38,21 @@ def add_config():
 # fonction de modification d'adresse IP (pour le moment) pour le serveur donné
 def mod_config():
     print(Fore.CYAN + "Vous êtes dans le menu de modification de configuration \n")
-    new_server_name = input("Entrez le nom du serveur: ")
+    new_server_name = input("Entrez le nom du serveur: \n")
     for config in configurations:
         if(config["server_name"] == new_server_name):
-            new_IP_address = input(f"Entrez la nouvelle IP pour {new_server_name}: \n")
-            config["IP_address"] = new_IP_address
+            new_server_name_actual = input(f"Entrez le nouveau nom du serveur (pressez Entrée pour ne pas modifier): \n")
+            if new_server_name_actual:
+                config['server_name'] = new_server_name_actual
+            new_IP_address = input(f"Entrez la nouvelle IP pour {new_server_name} (pressez Entrée pour ne pas modifier): \n")
+            if new_IP_address:
+                config["IP_address"] = new_IP_address
+            new_os = input(f"Entrez le nouvel système d'exploitation pour {new_server_name} (pressez Entrée pour ne pas modifier): \n")
+            if new_os:
+                config['os'] = new_os
+            new_services = input(f"Entrez le(s) nouveau(x) services en cours d'exécution (séparés par des virgules) ou pressez Entrée pour ne pas modifier: \n").split(",")
+            if new_services:
+                config['services'] = [service.strip() for service in new_services]
             print(Fore.GREEN + f'Configuration mise à jour pour {new_server_name}!')
             return
         print(Fore.RED + f'Aucune configuration trouvée pour {new_server_name}.')
@@ -117,7 +136,9 @@ def scan_config():
 
 # menu et display
 def afficher_menu():
-    print(Fore.WHITE + "\n--- Menu ---")
+    global a
+    print(Fore.CYAN + a)
+    print(Fore.WHITE + "--- Menu ---")
     print(Fore.CYAN + "1. Ajouter une configuration")
     print(Fore.CYAN + "2. Modifier une configuration")
     print(Fore.CYAN + "3. Supprimer une configuration")
