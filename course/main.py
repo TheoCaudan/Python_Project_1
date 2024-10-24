@@ -1,7 +1,7 @@
 import json
 import nmap
 import colorama
-from colorama import init, Fore, Back, Style
+from colorama import init, Fore
 
 # Initialisation de colorama
 init(autoreset=True)
