@@ -2,6 +2,7 @@ import json
 import nmap
 import colorama
 from colorama import init, Fore
+import re # validateur d'ip
 
 # Initialisation de colorama
 init(autoreset=True)
@@ -9,11 +10,23 @@ init(autoreset=True)
 # declaration d'une variable globale accessible partout pour sav/rol_configs pour la manipulation de fichiers
 configurations = []
 
+# fonction de validation IP (vérifie le format)
+def is_valid_ip(ip):
+    # Expression régulière pour valider une adresse IP
+    ip_regex = r'^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+    return re.match(ip_regex, ip) is not None
+
 # fonction d'ajout de config
 def add_config():
     print(Fore.CYAN + "Vous êtes dans le menu d'ajout de configuration \n")
     server_name = input("Entrez le nom du serveur: \n")
-    IP_address = input("Entrez l'adresse IP: \n")
+    # Validation de l'adresse IP
+    while True:
+        IP_address = input(Fore.WHITE + "Entrez l'adresse IP (ex: 192.168.1.1): \n")
+        if is_valid_ip(IP_address):
+            break
+        else:
+            print(Fore.RED + "Erreur : Veuillez entrer une adresse IP valide (ex: 192.168.1.1)")
     os = input("Entrez le système d'exploitation (ex: Windows, centOS, Ubuntu, Debian, Mint): \n")
     services = input("Entrez les services en cours d'exécution (séparés par des virgules): \n").split(",")
 
