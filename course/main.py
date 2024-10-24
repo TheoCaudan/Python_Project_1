@@ -51,9 +51,7 @@ def mod_config():
             if new_os:
                 config['os'] = new_os
             new_services = input(f"Entrez le(s) nouveau(x) services en cours d'exécution (séparés par des virgules) ou pressez Entrée pour ne pas modifier: \n").split(",")
-            print(f'WWWWWWWWWWWWWWWWW {new_services} WWWWWWWWWWWWWWWWWWWWWW')
             if new_services != [] and new_services != ['']:
-                print("if")
                 config['services'] = [service.strip() for service in new_services]
             print(Fore.GREEN + f'Configuration mise à jour pour {new_server_name}!')
             return
