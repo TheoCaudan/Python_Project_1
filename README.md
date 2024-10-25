@@ -24,5 +24,5 @@ Recover configuration from a json
 And the most interesting part is the last option :
     - Nmap port scan from IP address or IP range
 
-I plan to add to the scan, a name scan and os detection to the scan
+I plan to add, a name scan and os detection to the scan
     
