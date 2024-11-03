@@ -1,13 +1,12 @@
 import json
 import nmap
-import colorama
 from colorama import init, Fore
-import re # validateur d'ip
+import re  # validateur d'ip
 
 # Initialisation de colorama
 init(autoreset=True)
 
-# declaration d'une variable globale accessible partout pour sav/rol_configs pour la manipulation de fichiers
+# déclaration d'une variable globale accessible partout pour sav/rol_configs pour la manipulation de fichiers
 configurations = []
 
 # fonction de validation IP (vérifie le format)
@@ -44,7 +43,7 @@ def mod_config():
     print(Fore.CYAN + "Vous êtes dans le menu de modification de configuration \n")
     new_server_name = input("Entrez le nom du serveur: \n")
     for config in configurations:
-        if(config["server_name"] == new_server_name):
+        if config["server_name"] == new_server_name:
             new_server_name_actual = input(f"Entrez le nouveau nom du serveur (pressez Entrée pour ne pas modifier): \n")
             if new_server_name_actual:
                 config['server_name'] = new_server_name_actual
@@ -59,11 +58,11 @@ def mod_config():
                 config['services'] = [service.strip() for service in new_services]
             print(Fore.GREEN + f'Configuration mise à jour pour {new_server_name}!')
             return
-        print(Fore.RED + f'Aucune configuration trouvée pour {new_server_name}.')
+    print(Fore.RED + f'Aucune configuration trouvée pour {new_server_name}.')
 
 # fonction de suppression de config
 def del_config():
-    global configurations # necessaire pour que la fonction del_config accede à la variable globale
+    global configurations  # necessaire pour que la fonction del_config accede à la variable globale
     print(Fore.CYAN + "Vous êtes dans le menu de suppression de configuration \n")
     new_server_name = input("Entrez le nom du serveur à supprimer: ")
     configurations = [config for config in configurations if config["server_name"] != new_server_name]
@@ -78,9 +77,9 @@ def ls_config():
     print(Fore.GREEN + "Configurations enregistrées: \n")
     for i, config in enumerate(configurations, 1):
         print(Fore.WHITE + f'\n{i}. {config["server_name"]}')
-        print(Fore.WHITE + f" -Adresse IP: {config['IP_address']}")
-        print(Fore.WHITE + f" -Système d'exploitation: {config['os']}")
-        print(Fore.WHITE + f" -Services: {','.join(config['services'])}")
+        print(Fore.WHITE + f" - Adresse IP: {config['IP_address']}")
+        print(Fore.WHITE + f" - Système d'exploitation: {config['os']}")
+        print(Fore.WHITE + f" - Services: {','.join(config['services'])}")
 
 # fonction qui demande un nom de fichier et sauvegarde la config souhaitée dans un fichier .json
 def sav_config():
@@ -92,7 +91,7 @@ def sav_config():
 
 # permet de recuperer le json sauvegardé et le remettre à porter de main dans le menu
 def rol_config():
-    global configurations # necessaire pour que la fonction rol_config accede à la variable globale
+    global configurations  # necessaire pour que la fonction rol_config accede à la variable globale
     print(Fore.CYAN + "Vous êtes dans le menu de restauration de configuration: \n")
     file = input("Entrez le nom du fichier de sauvegarde à restaurer (ex: configurations.json): ")
     with open(file, 'r') as f:
@@ -104,20 +103,26 @@ def scan_ports(target):
     nm = nmap.PortScanner()
     print(Fore.MAGENTA + f"Scan en cours sur {target}... \n")    
     
-    try: #permet de gerer les exceptions et continuer a executer meme si l'iteration precedente à echoué
-        nm.scan(target, '1-1024')
+    try:  # permet de gerer les exceptions et continuer a executer meme si l'iteration precedente à echoué
+        nm.scan(target, '1-1024', arguments='-O')
 
         if target in nm.all_hosts():
+            # Récupération du nom d'hôte et de l'OS
+            host_name = nm[target].hostname() or "Inconnu"
+            os = nm[target]['osmatch'][0]['name'] if nm[target]['osmatch'] else "Système d'exploitation inconnu"
+            
             print(Fore.GREEN + f"Serveur actif: {target}")
+            print(Fore.GREEN + f" - Nom d'hôte: {host_name}")
+            print(Fore.GREEN + f" - Système d'exploitation détecté: {os}")
             print(Fore.GREEN + " - Services détectés:")
             for proto in nm[target].all_protocols():
                 lport = nm[target][proto].keys()
                 for port in sorted(lport):
-                    service_name = nm[target][proto][port]['name'] if 'name' in nm[target][proto][port] else 'Unknown'
+                    service_name = nm[target][proto][port]['name'] if 'name' in nm[target][proto][port] else 'Inconnu'
                     print(Fore.GREEN + f"    - Port: {port} : {service_name}")
         else:
             print(Fore.RED + f"Aucune donnée trouvée pour {target}. Peut-être que l'hôte est hors-ligne.")
-    except Exception as e: # gestion exception : ici elle signale l'erreur
+    except Exception as e:  # gestion exception : ici elle signale l'erreur
         print(Fore.RED + f"Erreur lors du scan de {target} : {e}")
 
 # fonction de scan : recupere une IP ou une plage d'IP et la decoupe pour identifier depart et arrivee dans le scan
@@ -125,8 +130,7 @@ def scan_config():
     print(Fore.CYAN + "Vous êtes dans le menu de scan \n")
     ip_range = input("Entrez la plage d'adresses IP à scanner (ex: 192.168.1.1 ou 192.168.1.1-192.168.1.10): \n")
 
-
-    if '-' in ip_range: # detection du '-' pour savoir que ce soit une plage d'ip ou bien une ip seule
+    if '-' in ip_range:  # detection du '-' pour savoir que ce soit une plage d'ip ou bien une ip seule
         start_ip, end_ip = ip_range.split('-')
         start_ip_parts = list(map(int, start_ip.split('.')))
         end_ip_parts = list(map(int, end_ip.split('.')))
@@ -135,7 +139,7 @@ def scan_config():
         for i in range(start_ip_parts[2], end_ip_parts[2] + 1):
             ip_to_scan = f"{start_ip_parts[0]}.{start_ip_parts[1]}.{start_ip_parts[2]}.{i}"
             scan_ports(ip_to_scan)
-    else: # pour une ip seule
+    else:  # pour une ip seule
         print(Fore.CYAN + "Résultats du scan: \n")
         scan_ports(ip_range)
 
