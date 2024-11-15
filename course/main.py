@@ -1,4 +1,5 @@
 import json
+import os
 import nmap
 from colorama import init, Fore
 import re  # validateur d'ip
@@ -26,13 +27,13 @@ def add_config():
             break
         else:
             print(Fore.RED + "Erreur : Veuillez entrer une adresse IP valide (ex: 192.168.1.1)")
-    os = input("Entrez le système d'exploitation (ex: Windows, centOS, Ubuntu, Debian, Mint): \n")
+    os1 = input("Entrez le système d'exploitation (ex: Windows, centOS, Ubuntu, Debian, Mint): \n")
     services = input("Entrez les services en cours d'exécution (séparés par des virgules): \n").split(",")
 
     configuration = {
         "server_name": server_name,
         "IP_address": IP_address,
-        "os": os,
+        "os": os1,
         "services": [service.strip() for service in services]
     }
 
@@ -100,30 +101,59 @@ def rol_config():
 
 # outil de scan de port appelé par la fonction de scan 
 def scan_ports(target):
+    global configurations
     nm = nmap.PortScanner()
     print(Fore.MAGENTA + f"Scan en cours sur {target}... \n")    
     
-    try:  # permet de gerer les exceptions et continuer a executer meme si l'iteration precedente à echoué
+    try:  # Permet de gérer les exceptions et continuer à exécuter même si une itération précédente a échoué
         nm.scan(target, '1-1024', arguments='-O')
 
         if target in nm.all_hosts():
             # Récupération du nom d'hôte et de l'OS
             host_name = nm[target].hostname() or "Inconnu"
-            os = nm[target]['osmatch'][0]['name'] if nm[target]['osmatch'] else "Système d'exploitation inconnu"
+            os1 = nm[target]['osmatch'][0]['name'] if nm[target]['osmatch'] else "Système d'exploitation inconnu"
             
             print(Fore.GREEN + f"Serveur actif: {target}")
             print(Fore.GREEN + f" - Nom d'hôte: {host_name}")
-            print(Fore.GREEN + f" - Système d'exploitation détecté: {os}")
+            print(Fore.GREEN + f" - Système d'exploitation détecté: {os1}")
             print(Fore.GREEN + " - Services détectés:")
+
+            # Liste pour stocker les services détectés
+            services = []
+
             for proto in nm[target].all_protocols():
                 lport = nm[target][proto].keys()
                 for port in sorted(lport):
-                    service_name = nm[target][proto][port]['name'] if 'name' in nm[target][proto][port] else 'Inconnu'
+                    service_name = nm[target][proto][port].get('name', 'Inconnu')
                     print(Fore.GREEN + f"    - Port: {port} : {service_name}")
+                    services.append({"port": port, "service_name": service_name})
+
+            # Mise à jour de la configuration
+            configuration = {
+                "server_name": host_name,
+                "IP_address": target,
+                "os": os1,
+                "services": services  # Inclut tous les services détectés
+            }
+            base_name = "nmap_scan"
+            extension = ".json"
+            index = 1
+            file = f"{base_name}{index}{extension}"
+            # Boucle pour vérifier l'existence du fichier et incrémenter le numéro
+            while os.path.exists(file):
+                index += 1
+                file = f"{base_name}{index}{extension}"
+
+            # Ajouter la configuration et sauvegarder dans le fichier
+            configurations.append(configuration)
+            with open(file, 'w') as f:
+                json.dump(configurations, f, indent=4)  # Ajout d'un indent pour plus de lisibilité
+                print(Fore.GREEN + f"Configurations sauvegardées avec succès dans {file}!")
         else:
             print(Fore.RED + f"Aucune donnée trouvée pour {target}. Peut-être que l'hôte est hors-ligne.")
-    except Exception as e:  # gestion exception : ici elle signale l'erreur
+    except Exception as e:  # Gestion des exceptions
         print(Fore.RED + f"Erreur lors du scan de {target} : {e}")
+
 
 # fonction de scan : recupere une IP ou une plage d'IP et la decoupe pour identifier depart et arrivee dans le scan
 def scan_config():
