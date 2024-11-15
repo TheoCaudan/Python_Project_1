@@ -99,6 +99,30 @@ def rol_config():
         configurations = json.load(f)
     print(Fore.GREEN + f"Configurations restaurées avec succès depuis {file}!")
 
+def save_scan(target, host_name, os1, services):
+    # Mise à jour de la configuration
+            configuration = {
+                "server_name": host_name,
+                "IP_address": target,
+                "os": os1,
+                "services": services  # Inclut tous les services détectés
+            }
+            base_name = "nmap_scan"
+            extension = ".json"
+            index = 1
+            file = f"{base_name}{index}{extension}"
+            # Boucle pour vérifier l'existence du fichier et incrémenter le numéro
+            while os.path.exists(file):
+                index += 1
+                file = f"{base_name}{index}{extension}"
+
+            # Ajouter la configuration et sauvegarder dans le fichier
+            configurations.append(configuration)
+            with open(file, 'w') as f:
+                json.dump(configurations, f, indent=4)  # Ajout d'un indent pour plus de lisibilité
+                print(Fore.GREEN + f"Configurations sauvegardées avec succès dans {file}!")
+
+
 # outil de scan de port appelé par la fonction de scan 
 def scan_ports(target):
     global configurations
@@ -127,28 +151,8 @@ def scan_ports(target):
                     service_name = nm[target][proto][port].get('name', 'Inconnu')
                     print(Fore.GREEN + f"    - Port: {port} : {service_name}")
                     services.append({"port": port, "service_name": service_name})
-
-            # Mise à jour de la configuration
-            configuration = {
-                "server_name": host_name,
-                "IP_address": target,
-                "os": os1,
-                "services": services  # Inclut tous les services détectés
-            }
-            base_name = "nmap_scan"
-            extension = ".json"
-            index = 1
-            file = f"{base_name}{index}{extension}"
-            # Boucle pour vérifier l'existence du fichier et incrémenter le numéro
-            while os.path.exists(file):
-                index += 1
-                file = f"{base_name}{index}{extension}"
-
-            # Ajouter la configuration et sauvegarder dans le fichier
-            configurations.append(configuration)
-            with open(file, 'w') as f:
-                json.dump(configurations, f, indent=4)  # Ajout d'un indent pour plus de lisibilité
-                print(Fore.GREEN + f"Configurations sauvegardées avec succès dans {file}!")
+            save_scan(target, host_name, os1, services)
+            
         else:
             print(Fore.RED + f"Aucune donnée trouvée pour {target}. Peut-être que l'hôte est hors-ligne.")
     except Exception as e:  # Gestion des exceptions
